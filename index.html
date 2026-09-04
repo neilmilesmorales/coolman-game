@@ -32,15 +32,22 @@
         .game-info {
             background: linear-gradient(135deg, #0066cc, #00ccff);
             color: white;
-            padding: 15px 20px;
+            padding: 10px 15px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
         }
 
         .game-info div {
-            font-size: 16px;
+            font-size: 13px;
+            flex: 1;
+            min-width: 100%;
+        }
+
+        .game-info div:last-child {
+            min-width: auto;
         }
 
         canvas {
@@ -103,36 +110,14 @@
             }
         }
 
-        @keyframes finalBossGlow {
-            0%, 100% {
-                box-shadow: 0 0 20px rgba(255, 100, 0, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(255, 100, 0, 0.9);
-            }
-        }
-
-        .level-up.final-boss {
-            background: linear-gradient(135deg, #ff4400, #ff8800);
-            animation: finalBossGlow 1.5s ease-in-out infinite, levelUpPulse 0.6s ease-out;
-        }
-
-        .level-up.final-boss h2 {
-            color: #ffff00;
-            text-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
-            font-size: 56px;
-        }
-
         .level-up h2 {
             font-size: 48px;
-            margin: 0 0 20px 0;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
         }
 
         .level-up p {
-            font-size: 24px;
-            margin: 10px 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
         .level-overlay {
@@ -140,10 +125,21 @@
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             z-index: 97;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
         }
 
         .game-over {
@@ -152,39 +148,115 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #0066cc, #00ccff);
+            color: white;
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.6);
             text-align: center;
             z-index: 100;
         }
 
         .game-over h2 {
-            color: #0066cc;
-            margin-bottom: 15px;
-            font-size: 28px;
+            font-size: 48px;
+            margin-bottom: 20px;
         }
 
         .game-over p {
-            color: #333;
-            margin: 10px 0;
             font-size: 18px;
+            margin-bottom: 10px;
         }
 
         .game-over button {
-            background: #0066cc;
-            color: white;
+            background: #00ffff;
+            color: #000;
             border: none;
             padding: 12px 30px;
-            border-radius: 5px;
             font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
+            font-weight: bold;
         }
 
         .game-over button:hover {
-            background: #004a99;
+            background: #00ddff;
+        }
+
+        .victory {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #00ccff, #0066cc);
+            color: white;
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            z-index: 100;
+            animation: victoryPulse 0.8s ease-out;
+        }
+
+        @keyframes victoryPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .victory h2 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .stars {
+            font-size: 80px;
+            margin: 30px 0;
+            letter-spacing: 15px;
+            animation: starSpin 1s ease-out;
+        }
+
+        @keyframes starSpin {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .victory p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .victory button {
+            background: #ffff00;
+            color: #0066cc;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .victory button:hover {
+            background: #ffdd00;
         }
 
         .overlay {
@@ -192,9 +264,9 @@
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
             z-index: 99;
         }
     </style>
@@ -203,11 +275,11 @@
     <div class="game-container">
         <div class="game-info">
             <div>🕷️ SPIDER-MAN & MILES MORALES - FLIGHT COMBAT 🕷️</div>
-            <div>Level: <span id="level">1</span> | Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+            <div>Level: <span id="level">1</span> | Score: <span id="score">0</span> | Lives: <span id="lives">3</span> | High Score: <span id="highscore">0</span> | Best Level: <span id="bestlevel">1</span></div>
         </div>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="controls">
-            <strong>WASD</strong> or <strong>ARROW KEYS</strong> to Fly | <strong>SPACE</strong> to Shoot Web! | Collect energy crystals and destroy enemies!
+            <strong>WASD</strong> or <strong>ARROW KEYS</strong> to Fly | <strong>SPACE</strong> to Shoot Web! | <strong>E</strong> to Swing! | Collect energy crystals and destroy enemies!
         </div>
         <div class="power-display">
             ⚡ Web Power: <span id="firepower">100</span>%
@@ -221,6 +293,14 @@
         <p id="levelUpText">Level 1</p>
         <p style="font-size: 16px; margin-top: 15px;">Get ready for harder challenges!</p>
     </div>
+    <div class="victory" id="victory">
+        <h2>🎉 VICTORY! 🎉</h2>
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>You defeated VENOM!</p>
+        <p>Spider-Man & Miles Morales prevail!</p>
+        <p>Final Score: <span id="victoryScore">0</span></p>
+        <button onclick="location.reload()">Play Again</button>
+    </div>
     <div class="game-over" id="gameOver">
         <h2>GAME OVER</h2>
         <p>Final Score: <span id="finalScore">0</span></p>
@@ -232,6 +312,51 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Local Storage Management
+        const saveGame = () => {
+            try {
+                const gameData = {
+                    score: score,
+                    lives: lives,
+                    level: level,
+                    highScore: highScore,
+                    bestLevel: bestLevel,
+                    timestamp: new Date().toLocaleString()
+                };
+                localStorage.setItem('spidermanGameProgress', JSON.stringify(gameData));
+                console.log('Game saved:', gameData);
+            } catch(e) {
+                console.log('Could not save game:', e);
+            }
+        };
+
+        const loadGame = () => {
+            try {
+                const saved = localStorage.getItem('spidermanGameProgress');
+                if (saved) {
+                    const gameData = JSON.parse(saved);
+                    highScore = gameData.highScore || 0;
+                    bestLevel = gameData.bestLevel || 1;
+                    console.log('Game loaded. High Score:', highScore, 'Best Level:', bestLevel);
+                    return gameData;
+                }
+            } catch(e) {
+                console.log('Could not load game:', e);
+            }
+            return null;
+        };
+
+        const clearSaveData = () => {
+            try {
+                localStorage.removeItem('spidermanGameProgress');
+                highScore = 0;
+                bestLevel = 1;
+                console.log('Save data cleared');
+            } catch(e) {
+                console.log('Could not clear save data:', e);
+            }
+        };
+
         // Game variables
         let gameActive = true;
         let score = 0;
@@ -242,6 +367,15 @@
         let levelUpThreshold = 200;
         let levelUpTimer = 0;
         let finalBossMode = false;
+        let highScore = 0;
+        let bestLevel = 1;
+
+        // Load saved progress on startup
+        loadGame();
+
+        // Update UI with saved progress
+        document.getElementById('highscore').textContent = highScore;
+        document.getElementById('bestlevel').textContent = bestLevel;
 
         // Level descriptions
         const levelDescriptions = {
@@ -254,8 +388,11 @@
             7: "Level 7: Legendary",
             8: "Level 8: Extreme",
             9: "Level 9: Insane",
-            10: "Level 10: ULTIMATE CHAOS"
+            10: "Level 10: VENOM STRIKES"
         };
+
+        // Venom boss object
+        let venomBoss = null;
 
         // Coolman player object (flying like Iron Man)
         const player = {
@@ -270,7 +407,14 @@
             friction: 0.92,
             angle: 0,
             thrustParticles: [],
-            nanoParticles: []
+            nanoParticles: [],
+            isSwinging: false,
+            swingAngle: 0,
+            swingRadius: 100,
+            swingCenter: {x: 0, y: 0},
+            shieldHealth: 100,
+            maxShieldHealth: 100,
+            shieldActive: true
         };
 
         // Game arrays
@@ -278,6 +422,7 @@
         let coins = [];
         let fireProjectiles = [];
         let friendProjectiles = [];
+        let enemyProjectiles = [];
 
         // Fire power system
         let firePower = 100;
@@ -299,7 +444,11 @@
             shootCooldown: 40,
             angle: 0,
             thrustParticles: [],
-            nanoParticles: []
+            nanoParticles: [],
+            isSwinging: false,
+            swingAngle: 0,
+            swingRadius: 80,
+            swingCenter: {x: 0, y: 0}
         };
 
         // Keyboard input
@@ -311,6 +460,12 @@
             if (e.key === ' ') {
                 e.preventDefault();
                 fireProjectile();
+            }
+
+            // Swing mechanic on E
+            if (e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                startSwing(player);
             }
         });
 
@@ -577,6 +732,208 @@
                 ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
+                ctx.shadowBlur = 0;
+            }
+
+            isOffScreen() {
+                return this.x < -20 || this.x > canvas.width + 20 ||
+                       this.y < -20 || this.y > canvas.height + 20;
+            }
+        }
+
+        // Venom Boss class
+        class VenomBoss {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.width = 80;
+                this.height = 100;
+                this.health = 500;
+                this.maxHealth = 500;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.speed = 2.5;
+                this.shootTimer = 0;
+                this.shootCooldown = 30;
+                this.phase = 1; // 3 phases based on health
+                this.moveTimer = 0;
+                this.moveDirection = 0;
+                this.attack = 0;
+            }
+
+            update() {
+                // Boss stays in center and just attacks
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Update phase based on health
+                if (this.health > this.maxHealth * 0.66) {
+                    this.phase = 1;
+                } else if (this.health > this.maxHealth * 0.33) {
+                    this.phase = 2;
+                } else {
+                    this.phase = 3;
+                }
+
+                // Venom stays roughly in the center - no movement towards player
+                // Just slight idle movement
+                this.moveTimer++;
+                if (this.moveTimer > 120) {
+                    this.moveDirection = Math.random() * Math.PI * 2;
+                    this.moveTimer = 0;
+                }
+
+                const speed = 0.5; // Very slow idle movement
+                this.velocityX = Math.cos(this.moveDirection) * speed;
+                this.velocityY = Math.sin(this.moveDirection) * speed;
+
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+
+                // Keep Venom in the center area
+                if (this.x < canvas.width / 4) this.x = canvas.width / 4;
+                if (this.x + this.width > canvas.width * 0.75) this.x = canvas.width * 0.75 - this.width;
+                if (this.y < canvas.height / 4) this.y = canvas.height / 4;
+                if (this.y + this.height > canvas.height * 0.75) this.y = canvas.height * 0.75 - this.height;
+
+                // Aggressive attack pattern
+                this.shootTimer--;
+                if (this.shootTimer <= 0) {
+                    const projectilesPerShot = this.phase; // 1, 2, or 3 projectiles
+                    for (let i = 0; i < projectilesPerShot; i++) {
+                        const angle = Math.atan2(dy, dx) + (i - (projectilesPerShot - 1) / 2) * 0.3;
+                        const projectile = new EnemyProjectile(
+                            this.x + this.width / 2,
+                            this.y + this.height / 2,
+                            Math.cos(angle),
+                            Math.sin(angle),
+                            '#ffffff'
+                        );
+                        enemyProjectiles.push(projectile);
+                    }
+                    const cooldown = Math.max(100 - this.phase * 10, 70);
+                    this.shootTimer = cooldown;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+                // Venom body - white with black accents
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(-this.width / 2, -this.height / 2 + 10);
+                ctx.lineTo(this.width / 2, -this.height / 2 + 15);
+                ctx.lineTo(this.width / 2 - 5, this.height / 2 - 15);
+                ctx.lineTo(-this.width / 2 + 5, this.height / 2 - 10);
+                ctx.closePath();
+                ctx.fill();
+
+                // Black symbiote accents
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(-this.width / 2, -this.height / 2 + 10, this.width, 15);
+
+                // Venom mouth (red)
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(-this.width / 2 + 10, -this.height / 2 + 5, this.width - 20, 8);
+
+                // Teeth
+                ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < 5; i++) {
+                    ctx.fillRect(-this.width / 2 + 15 + i * 10, -this.height / 2 + 6, 5, 4);
+                }
+
+                // Venom eyes - large and white
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(-this.width / 3, -this.height / 2 + 20, 12, 16, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(this.width / 3, -this.height / 2 + 20, 12, 16, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eye pupils (black)
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.ellipse(-this.width / 3, -this.height / 2 + 22, 8, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(this.width / 3, -this.height / 2 + 22, 8, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Spider symbol on chest
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 5, 8, 0, Math.PI * 2);
+                ctx.stroke();
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 5);
+                    ctx.lineTo(Math.cos(angle) * 10, 5 + Math.sin(angle) * 10);
+                    ctx.stroke();
+                }
+
+                // Symbiote tendrils on sides
+                ctx.strokeStyle = '#444444';
+                ctx.lineWidth = 3;
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(-this.width / 2, -this.height / 2 + 30 + i * 15);
+                    ctx.quadraticCurveTo(-this.width / 2 - 20, -this.height / 2 + 35 + i * 15, -this.width / 2 - 10, -this.height / 2 + 40 + i * 15);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(this.width / 2, -this.height / 2 + 30 + i * 15);
+                    ctx.quadraticCurveTo(this.width / 2 + 20, -this.height / 2 + 35 + i * 15, this.width / 2 + 10, -this.height / 2 + 40 + i * 15);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+
+                // Health bar
+                const healthPercent = this.health / this.maxHealth;
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(canvas.width / 2 - 100, 20, healthPercent * 200, 20);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(canvas.width / 2 - 100, 20, 200, 20);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`VENOM HP: ${Math.max(0, Math.floor(this.health))}`, canvas.width / 2, 37);
+                ctx.textAlign = 'left';
+            }
+        }
+
+        // Enemy projectile class (for Venom)
+        class EnemyProjectile {
+            constructor(x, y, vx, vy, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx * 6;
+                this.vy = vy * 6;
+                this.radius = 8;
+                this.color = color;
+                this.life = 100;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.shadowBlur = 0;
             }
 
@@ -969,6 +1326,48 @@
 
         // Draw Spider-Man with Nanotech Suit
         function drawCoolman() {
+            // Draw futuristic shield around player
+            if (player.shieldHealth > 0) {
+                const shieldIntensity = player.shieldHealth / player.maxShieldHealth;
+                ctx.save();
+                ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+
+                // Shield outer circle
+                ctx.strokeStyle = `rgba(0, 255, 255, ${shieldIntensity * 0.6})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, 0, 50, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Shield inner circle
+                ctx.strokeStyle = `rgba(0, 220, 255, ${shieldIntensity * 0.4})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(0, 0, 48, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Shield energy lines (horizontal)
+                ctx.strokeStyle = `rgba(0, 180, 255, ${shieldIntensity * 0.3})`;
+                ctx.lineWidth = 1;
+                for (let i = -40; i <= 40; i += 15) {
+                    ctx.beginPath();
+                    ctx.moveTo(-45, i);
+                    ctx.lineTo(45, i);
+                    ctx.stroke();
+                }
+
+                // Glow effect
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 20;
+                ctx.strokeStyle = `rgba(0, 255, 255, ${shieldIntensity * 0.2})`;
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(0, 0, 50, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
             ctx.save();
             ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
             ctx.rotate(player.angle);
@@ -1356,6 +1755,68 @@
             }
         }
 
+        // Start swing mechanic for character
+        function startSwing(character) {
+            if (!character.isSwinging) {
+                character.isSwinging = true;
+                character.swingAngle = 0;
+                character.swingCenter.x = character.x;
+                character.swingCenter.y = character.y;
+                character.velocityX = 0;
+                character.velocityY = 0;
+            }
+        }
+
+        // Update swing for character
+        function updateSwing(character) {
+            if (character.isSwinging) {
+                // Swing arc animation
+                character.swingAngle += 0.15; // Swing speed
+
+                // Calculate position along swing arc
+                const swingX = character.swingCenter.x + Math.sin(character.swingAngle) * character.swingRadius;
+                const swingY = character.swingCenter.y + Math.cos(character.swingAngle) * character.swingRadius * 0.5;
+
+                // Calculate velocity from swing
+                character.velocityX = (swingX - character.x) * 0.2;
+                character.velocityY = (swingY - character.y) * 0.2;
+
+                character.x = swingX;
+                character.y = swingY;
+
+                // Rotate character during swing
+                character.angle = character.swingAngle - Math.PI / 2;
+
+                // Create extra thrust particles during swing
+                for (let i = 0; i < 3; i++) {
+                    const particle = character === player ?
+                        new ThrustParticle(character.x, character.y, character.angle) :
+                        new AllyThrustParticle(character.x, character.y, character.angle);
+
+                    if (character === player) {
+                        character.thrustParticles.push(particle);
+                    } else {
+                        character.thrustParticles.push(particle);
+                    }
+                }
+
+                // End swing after full arc
+                if (character.swingAngle > Math.PI) {
+                    character.isSwinging = false;
+                    character.angle = 0;
+                    // Apply momentum from swing
+                    character.velocityX = Math.sin(character.swingAngle) * 6;
+                    character.velocityY = Math.cos(character.swingAngle) * 3;
+                }
+
+                // Boundary check during swing
+                if (character.x < 0) character.x = 0;
+                if (character.x + character.width > canvas.width) character.x = canvas.width - character.width;
+                if (character.y < 0) character.y = 0;
+                if (character.y + character.height > canvas.height) character.y = canvas.height - character.height;
+            }
+        }
+
         // Draw background
         function drawBackground() {
             // Sky gradient
@@ -1410,32 +1871,38 @@
             // Update Fire Man ally AI
             updateAllyAI();
 
+            // Update player swing
+            updateSwing(player);
+
             // Iron Man style flight controls
             let moving = false;
 
-            if (keys['w'] || keys['arrowup']) {
-                player.velocityY = Math.max(player.velocityY - player.acceleration, -player.maxSpeed);
-                player.angle = 0;
-                moving = true;
-            }
-            if (keys['s'] || keys['arrowdown']) {
-                player.velocityY = Math.min(player.velocityY + player.acceleration, player.maxSpeed);
-                player.angle = Math.PI;
-                moving = true;
-            }
-            if (keys['a'] || keys['arrowleft']) {
-                player.velocityX = Math.max(player.velocityX - player.acceleration, -player.maxSpeed);
-                player.angle = -Math.PI / 2;
-                moving = true;
-            }
-            if (keys['d'] || keys['arrowright']) {
-                player.velocityX = Math.min(player.velocityX + player.acceleration, player.maxSpeed);
-                player.angle = Math.PI / 2;
-                moving = true;
+            // Only allow normal controls when not swinging
+            if (!player.isSwinging) {
+                if (keys['w'] || keys['arrowup']) {
+                    player.velocityY = Math.max(player.velocityY - player.acceleration, -player.maxSpeed);
+                    player.angle = 0;
+                    moving = true;
+                }
+                if (keys['s'] || keys['arrowdown']) {
+                    player.velocityY = Math.min(player.velocityY + player.acceleration, player.maxSpeed);
+                    player.angle = Math.PI;
+                    moving = true;
+                }
+                if (keys['a'] || keys['arrowleft']) {
+                    player.velocityX = Math.max(player.velocityX - player.acceleration, -player.maxSpeed);
+                    player.angle = -Math.PI / 2;
+                    moving = true;
+                }
+                if (keys['d'] || keys['arrowright']) {
+                    player.velocityX = Math.min(player.velocityX + player.acceleration, player.maxSpeed);
+                    player.angle = Math.PI / 2;
+                    moving = true;
+                }
             }
 
-            // Apply friction when not moving
-            if (!moving) {
+            // Apply friction when not moving (and not swinging)
+            if (!moving && !player.isSwinging) {
                 player.velocityX *= player.friction;
                 player.velocityY *= player.friction;
                 player.angle = 0;
@@ -1462,15 +1929,49 @@
                 levelUpThreshold += 250; // Increase threshold for next level
             }
 
-            // Spawn obstacles (increases with level, capped at level 10)
-            const obstacleSpawnRate = Math.min(0.015 + (level * 0.004), 0.055);
-            if (Math.random() < obstacleSpawnRate) {
-                obstacles.push(new IceLaser());
+            // Venom boss at level 10
+            if (level === maxLevel && !venomBoss) {
+                venomBoss = new VenomBoss();
             }
 
-            // Spawn coins
-            if (Math.random() < 0.012) {
-                coins.push(new IceCrystal());
+            // Update Venom if he exists
+            if (venomBoss) {
+                venomBoss.update();
+
+                // Check collision with player
+                if (checkCollision(
+                    player.x + player.width / 2,
+                    player.y + player.height / 2,
+                    20,
+                    venomBoss.x,
+                    venomBoss.y,
+                    venomBoss.width,
+                    venomBoss.height
+                )) {
+                    lives -= 2;
+                    document.getElementById('lives').textContent = lives;
+                    if (lives <= 0) {
+                        endGame();
+                    }
+                }
+            }
+
+            // Spawn obstacles only if not at boss level
+            if (level < maxLevel) {
+                const obstacleSpawnRate = Math.min(0.015 + (level * 0.004), 0.055);
+                if (Math.random() < obstacleSpawnRate) {
+                    obstacles.push(new IceLaser());
+                }
+
+                // Spawn coins
+                if (Math.random() < 0.012) {
+                    coins.push(new IceCrystal());
+                }
+            } else if (venomBoss) {
+                // Spawn coins at boss level for health/power ups
+                if (Math.random() < 0.008) {
+                    coins.push(new IceCrystal());
+                }
             }
 
             // Update obstacles
@@ -1520,9 +2021,72 @@
                 }
             }
 
+            // Regenerate shield when not taking damage
+            if (player.shieldHealth < player.maxShieldHealth) {
+                player.shieldHealth = Math.min(player.shieldHealth + 0.3, player.maxShieldHealth);
+            }
+
+            // Update enemy projectiles (from Venom)
+            for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+                enemyProjectiles[i].update();
+
+                // Check collision with player shield
+                if (checkCollision(
+                    enemyProjectiles[i].x,
+                    enemyProjectiles[i].y,
+                    enemyProjectiles[i].radius,
+                    player.x,
+                    player.y,
+                    player.width,
+                    player.height
+                )) {
+                    // Damage shield first
+                    if (player.shieldHealth > 0) {
+                        player.shieldHealth -= 20;
+                        if (player.shieldHealth < 0) player.shieldHealth = 0;
+                    } else {
+                        // If shield is down, lose a life
+                        lives--;
+                        document.getElementById('lives').textContent = lives;
+                        if (lives <= 0) {
+                            endGame();
+                        }
+                    }
+                    enemyProjectiles.splice(i, 1);
+                    continue;
+                }
+
+                if (enemyProjectiles[i] && enemyProjectiles[i].isOffScreen()) {
+                    enemyProjectiles.splice(i, 1);
+                }
+            }
+
             // Update fire projectiles
             for (let i = fireProjectiles.length - 1; i >= 0; i--) {
                 fireProjectiles[i].update();
+
+                // Check collision with Venom boss
+                if (venomBoss && checkCollision(
+                    fireProjectiles[i].x,
+                    fireProjectiles[i].y,
+                    fireProjectiles[i].radius,
+                    venomBoss.x,
+                    venomBoss.y,
+                    venomBoss.width,
+                    venomBoss.height
+                )) {
+                    venomBoss.health -= 25;
+                    score += 15;
+                    document.getElementById('score').textContent = score;
+                    fireProjectiles.splice(i, 1);
+                    if (venomBoss.health <= 0) {
+                        score += 500;
+                        document.getElementById('score').textContent = score;
+                        venomBoss = null;
+                        endGame(); // Victory!
+                    }
+                    continue;
+                }
 
                 // Check collision with obstacles
                 for (let j = obstacles.length - 1; j >= 0; j--) {
@@ -1552,6 +2116,29 @@
             for (let i = friendProjectiles.length - 1; i >= 0; i--) {
                 friendProjectiles[i].update();
 
+                // Check collision with Venom boss
+                if (venomBoss && checkCollision(
+                    friendProjectiles[i].x,
+                    friendProjectiles[i].y,
+                    friendProjectiles[i].radius,
+                    venomBoss.x,
+                    venomBoss.y,
+                    venomBoss.width,
+                    venomBoss.height
+                )) {
+                    venomBoss.health -= 10;
+                    score += 5;
+                    document.getElementById('score').textContent = score;
+                    friendProjectiles.splice(i, 1);
+                    if (venomBoss.health <= 0) {
+                        score += 500;
+                        document.getElementById('score').textContent = score;
+                        venomBoss = null;
+                        endGame(); // Victory!
+                    }
+                    continue;
+                }
+
                 // Check collision with obstacles
                 for (let j = obstacles.length - 1; j >= 0; j--) {
                     if (checkCollision(
@@ -1579,25 +2166,35 @@
 
         // Ally AI update function
         function updateAllyAI() {
+            // Update ally swing
+            updateSwing(ally);
+
             // Follow player at a distance
             const dx = player.x - ally.x;
             const dy = player.y - ally.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance > ally.targetDistance) {
-                // Move towards player
-                const angle = Math.atan2(dy, dx);
-                ally.velocityX = Math.cos(angle) * ally.speed;
-                ally.velocityY = Math.sin(angle) * ally.speed;
-                ally.angle = angle - Math.PI / 2;
-            } else {
-                // Slow down when close
-                ally.velocityX *= 0.9;
-                ally.velocityY *= 0.9;
+            // Occasionally swing (20% chance per frame when not already swinging)
+            if (!ally.isSwinging && Math.random() < 0.02) {
+                startSwing(ally);
             }
 
-            // Create thrust particles while moving
-            createAllyThrustParticles();
+            if (!ally.isSwinging) {
+                if (distance > ally.targetDistance) {
+                    // Move towards player
+                    const angle = Math.atan2(dy, dx);
+                    ally.velocityX = Math.cos(angle) * ally.speed;
+                    ally.velocityY = Math.sin(angle) * ally.speed;
+                    ally.angle = angle - Math.PI / 2;
+                } else {
+                    // Slow down when close
+                    ally.velocityX *= 0.9;
+                    ally.velocityY *= 0.9;
+                }
+
+                // Create thrust particles while moving
+                createAllyThrustParticles();
+            }
 
             // Update position
             ally.x += ally.velocityX;
@@ -1609,25 +2206,45 @@
             if (ally.y < 0) ally.y = 0;
             if (ally.y + ally.height > canvas.height) ally.y = canvas.height - ally.height;
 
-            // Shoot at obstacles (faster with higher levels, capped for level 10)
-            const shootCooldown = level === maxLevel ? 10 : Math.max(30 - level * 3, 15);
+            // Shoot at obstacles or Venom boss
+            const shootCooldown = level === maxLevel ? 30 : Math.max(30 - level * 3, 15);
             ally.shootTimer--;
-            if (ally.shootTimer <= 0 && obstacles.length > 0) {
-                // Find closest obstacle
-                let closestObstacle = obstacles[0];
-                let closestDist = Math.hypot(closestObstacle.x - ally.x, closestObstacle.y - ally.y);
+            if (ally.shootTimer <= 0) {
+                let target = null;
+                let targetDist = Infinity;
 
-                for (let obs of obstacles) {
-                    const dist = Math.hypot(obs.x - ally.x, obs.y - ally.y);
-                    if (dist < closestDist && dist < 400) {
-                        closestDist = dist;
-                        closestObstacle = obs;
+                // Prioritize Venom boss at level 10
+                if (venomBoss) {
+                    const bossDistX = venomBoss.x - ally.x;
+                    const bossDistY = venomBoss.y - ally.y;
+                    targetDist = Math.hypot(bossDistX, bossDistY);
+                    if (targetDist < 500) {
+                        target = venomBoss;
                     }
                 }
 
-                if (closestDist < 400) {
-                    const shootDx = closestObstacle.x - ally.x;
-                    const shootDy = closestObstacle.y - ally.y;
+                // Otherwise shoot at closest obstacle
+                if (!target && obstacles.length > 0) {
+                    let closestObstacle = obstacles[0];
+                    targetDist = Math.hypot(closestObstacle.x - ally.x, closestObstacle.y - ally.y);
+
+                    for (let obs of obstacles) {
+                        const dist = Math.hypot(obs.x - ally.x, obs.y - ally.y);
+                        if (dist < targetDist && dist < 400) {
+                            targetDist = dist;
+                            closestObstacle = obs;
+                        }
+                    }
+
+                    if (targetDist < 400) {
+                        target = closestObstacle;
+                    }
+                }
+
+                // Fire at target
+                if (target) {
+                    const shootDx = target.x - ally.x;
+                    const shootDy = target.y - ally.y;
                     const shootDist = Math.sqrt(shootDx * shootDx + shootDy * shootDy);
 
                     const projectile = new FriendFireProjectile(
@@ -1675,7 +2292,7 @@
             if (level === maxLevel) {
                 levelUpElement.classList.add('final-boss');
                 document.getElementById('levelUpText').textContent = `${levelDescriptions[level]}`;
-                document.getElementById('levelUpText').nextElementSibling.textContent = '⚡ ULTIMATE CHAOS AWAITS! ⚡';
+                document.getElementById('levelUpText').nextElementSibling.textContent = '🕸️ THE SYMBIOTE HAS ARRIVED! 🕸️';
             } else {
                 levelUpElement.classList.remove('final-boss');
                 document.getElementById('levelUpText').textContent = `${levelDescriptions[level]}`;
@@ -1683,6 +2300,17 @@
             }
 
             document.getElementById('level').textContent = level;
+
+            // Update best level and high score
+            if (level > bestLevel) {
+                bestLevel = level;
+                document.getElementById('bestlevel').textContent = bestLevel;
+            }
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('highscore').textContent = highScore;
+            }
+            saveGame();
 
             // Hide after animation
             setTimeout(() => {
@@ -1699,6 +2327,12 @@
             obstacles.forEach(obs => obs.draw());
             fireProjectiles.forEach(projectile => projectile.draw());
             friendProjectiles.forEach(projectile => projectile.draw());
+            enemyProjectiles.forEach(projectile => projectile.draw());
+
+            // Draw Venom boss if exists
+            if (venomBoss) {
+                venomBoss.draw();
+            }
 
             drawThrustParticles();
             drawCoolman();
@@ -1709,6 +2343,16 @@
             ctx.font = 'bold 14px Arial';
             ctx.fillText('Distance: ' + Math.floor(score / 10) + 'm', 10, 30);
             ctx.fillText('Speed: ' + Math.floor(Math.sqrt(player.velocityX ** 2 + player.velocityY ** 2) * 10) / 10, 10, canvas.height - 10);
+
+            // Draw shield indicator
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.8)';
+            ctx.fillRect(10, 50, player.shieldHealth * 1.5, 15);
+            ctx.strokeStyle = 'rgba(0, 255, 255, 1)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 50, 150, 15);
+            ctx.fillStyle = '#00ffff';
+            ctx.font = 'bold 11px Arial';
+            ctx.fillText('SHIELD', 60, 61);
 
             // Level up progress bar
             const progressPercentage = (score % 250) / 250;
@@ -1745,10 +2389,31 @@
         // End game
         function endGame() {
             gameActive = false;
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalLevel').textContent = level;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('gameOver').style.display = 'block';
+
+            // Update high score and best level
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('highscore').textContent = highScore;
+            }
+            if (level > bestLevel) {
+                bestLevel = level;
+                document.getElementById('bestlevel').textContent = bestLevel;
+            }
+            saveGame();
+
+            // Check if player won (Venom defeated)
+            if (level === maxLevel && !venomBoss) {
+                // Victory screen
+                document.getElementById('victoryScore').textContent = score;
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('victory').style.display = 'block';
+            } else {
+                // Game over screen
+                document.getElementById('finalScore').textContent = score;
+                document.getElementById('finalLevel').textContent = level;
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('gameOver').style.display = 'block';
+            }
         }
 
         // Start game
