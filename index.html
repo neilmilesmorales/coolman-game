@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider-Man & Miles Morales - Flight Combat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .game-info {
+            background: linear-gradient(135deg, #0066cc, #00ccff);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .game-info div {
+            font-size: 16px;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #001a4d 0%, #003d99 50%, #e0ecff 100%);
+        }
+
+        .controls {
+            background: #f0f0f0;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .controls strong {
+            color: #0066cc;
+        }
+
+        .power-display {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ccff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid #00ccff;
+        }
+
+        .level-up {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #0066cc, #00ccff);
+            color: white;
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.6);
+            text-align: center;
+            z-index: 98;
+            animation: levelUpPulse 0.6s ease-out;
+        }
+
+        @keyframes levelUpPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes finalBossGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 100, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 100, 0, 0.9);
+            }
+        }
+
+        .level-up.final-boss {
+            background: linear-gradient(135deg, #ff4400, #ff8800);
+            animation: finalBossGlow 1.5s ease-in-out infinite, levelUpPulse 0.6s ease-out;
+        }
+
+        .level-up.final-boss h2 {
+            color: #ffff00;
+            text-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+            font-size: 56px;
+        }
+
+        .level-up h2 {
+            font-size: 48px;
+            margin: 0 0 20px 0;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .level-up p {
+            font-size: 24px;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .level-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 97;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .game-over h2 {
+            color: #0066cc;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+
+        .game-over p {
+            color: #333;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .game-over button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .game-over button:hover {
+            background: #004a99;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-info">
+            <div>🕷️ SPIDER-MAN & MILES MORALES - FLIGHT COMBAT 🕷️</div>
+            <div>Level: <span id="level">1</span> | Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <strong>WASD</strong> or <strong>ARROW KEYS</strong> to Fly | <strong>SPACE</strong> to Shoot Web! | Collect energy crystals and destroy enemies!
+        </div>
+        <div class="power-display">
+            ⚡ Web Power: <span id="firepower">100</span>%
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="level-overlay" id="levelOverlay"></div>
+    <div class="level-up" id="levelUp">
+        <h2>⭐ LEVEL UP! ⭐</h2>
+        <p id="levelUpText">Level 1</p>
+        <p style="font-size: 16px; margin-top: 15px;">Get ready for harder challenges!</p>
+    </div>
+    <div class="game-over" id="gameOver">
+        <h2>GAME OVER</h2>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>Level Reached: <span id="finalLevel">1</span></p>
+        <button onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game variables
+        let gameActive = true;
+        let score = 0;
+        let lives = 3;
+        let gameSpeed = 4.5;
+        let level = 1;
+        let maxLevel = 10;
+        let levelUpThreshold = 200;
+        let levelUpTimer = 0;
+        let finalBossMode = false;
+
+        // Level descriptions
+        const levelDescriptions = {
+            1: "Level 1: Beginning",
+            2: "Level 2: Heating Up",
+            3: "Level 3: Intensity Rising",
+            4: "Level 4: Get Serious",
+            5: "Level 5: Halfway There",
+            6: "Level 6: Expert Mode",
+            7: "Level 7: Legendary",
+            8: "Level 8: Extreme",
+            9: "Level 9: Insane",
+            10: "Level 10: ULTIMATE CHAOS"
+        };
+
+        // Coolman player object (flying like Iron Man)
+        const player = {
+            x: 100,
+            y: 150,
+            width: 35,
+            height: 45,
+            velocityX: 0,
+            velocityY: 0,
+            acceleration: 0.6,
+            maxSpeed: 8,
+            friction: 0.92,
+            angle: 0,
+            thrustParticles: [],
+            nanoParticles: []
+        };
+
+        // Game arrays
+        let obstacles = [];
+        let coins = [];
+        let fireProjectiles = [];
+        let friendProjectiles = [];
+
+        // Fire power system
+        let firePower = 100;
+        let maxFirePower = 100;
+        let lastShotTime = 0;
+        let fireRechargeRate = 0.5;
+
+        // Fire Man ally
+        const ally = {
+            x: 150,
+            y: 200,
+            width: 32,
+            height: 42,
+            velocityX: 0,
+            velocityY: 0,
+            targetDistance: 80,
+            speed: 4,
+            shootTimer: 0,
+            shootCooldown: 40,
+            angle: 0,
+            thrustParticles: [],
+            nanoParticles: []
+        };
+
+        // Keyboard input
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+
+            // Fire projectile on spacebar
+            if (e.key === ' ') {
+                e.preventDefault();
+                fireProjectile();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Thrust particle class
+        class ThrustParticle {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.vx = Math.cos(angle + Math.PI) * 4;
+                this.vy = Math.sin(angle + Math.PI) * 4;
+                this.life = 30;
+                this.maxLife = 30;
+                this.size = 4;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.93;
+                this.vy *= 0.93;
+                this.life--;
+                this.size *= 0.92;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(0, 204, 255, ${this.life / this.maxLife * 0.9})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = `rgba(100, 255, 255, ${this.life / this.maxLife * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Nanotech particle class
+        class NanoParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.life = 20;
+                this.maxLife = 20;
+                this.size = Math.random() * 1.5 + 0.5;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+                this.life--;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(0, 255, 200, ${this.life / this.maxLife * 0.7})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Ally thrust particle class (purple for Miles)
+        class AllyThrustParticle {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.vx = Math.cos(angle + Math.PI) * 3.5;
+                this.vy = Math.sin(angle + Math.PI) * 3.5;
+                this.life = 25;
+                this.maxLife = 25;
+                this.size = 3.5;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.93;
+                this.vy *= 0.93;
+                this.life--;
+                this.size *= 0.92;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(153, 51, 255, ${this.life / this.maxLife * 0.9})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = `rgba(187, 85, 255, ${this.life / this.maxLife * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Ally nanotech particle class (purple for Miles)
+        class AllyNanoParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.life = 20;
+                this.maxLife = 20;
+                this.size = Math.random() * 1.3 + 0.4;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+                this.life--;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(187, 85, 255, ${this.life / this.maxLife * 0.7})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Fire Projectile class
+        class FireProjectile {
+            constructor(x, y, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx * 8; // Fire speed
+                this.vy = vy * 8;
+                this.radius = 6;
+                this.life = 80;
+                this.maxLife = 80;
+                this.trailParticles = [];
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+
+                // Create trail particles
+                if (Math.random() < 0.7) {
+                    this.trailParticles.push(new FireTrailParticle(this.x, this.y));
+                }
+            }
+
+            draw() {
+                // Fire ball glow
+                ctx.shadowColor = '#ff6600';
+                ctx.shadowBlur = 15;
+
+                // Outer glow
+                ctx.fillStyle = 'rgba(255, 100, 0, 0.6)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Main fire ball
+                ctx.fillStyle = '#ff6600';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Inner core (yellow)
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+
+                // Draw trail
+                this.trailParticles.forEach((particle, index) => {
+                    particle.update();
+                    particle.draw();
+                    if (particle.life <= 0) {
+                        this.trailParticles.splice(index, 1);
+                    }
+                });
+            }
+
+            isOffScreen() {
+                return this.x < -20 || this.x > canvas.width + 20 ||
+                       this.y < -20 || this.y > canvas.height + 20;
+            }
+        }
+
+        // Fire trail particle
+        class FireTrailParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 3;
+                this.vy = (Math.random() - 0.5) * 3 - 1;
+                this.life = 25;
+                this.maxLife = 25;
+                this.size = Math.random() * 3 + 2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy -= 0.2; // Rise up
+                this.life--;
+                this.size *= 0.92;
+            }
+
+            draw() {
+                const opacity = this.life / this.maxLife;
+                ctx.fillStyle = `rgba(255, ${Math.floor(100 + opacity * 155)}, 0, ${opacity * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Friend Fire Projectile (smaller, faster)
+        class FriendFireProjectile {
+            constructor(x, y, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx * 10;
+                this.vy = vy * 10;
+                this.radius = 4;
+                this.life = 100;
+                this.maxLife = 100;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+            }
+
+            draw() {
+                // Fire ball glow (smaller)
+                ctx.shadowColor = '#ff4400';
+                ctx.shadowBlur = 12;
+
+                // Outer glow
+                ctx.fillStyle = 'rgba(255, 80, 0, 0.7)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Main fire ball
+                ctx.fillStyle = '#ff5500';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Inner core (yellow)
+                ctx.fillStyle = '#ffdd00';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            }
+
+            isOffScreen() {
+                return this.x < -20 || this.x > canvas.width + 20 ||
+                       this.y < -20 || this.y > canvas.height + 20;
+            }
+        }
+
+        // Ice Laser Obstacle class
+        class IceLaser {
+            constructor() {
+                this.width = 80;
+                this.height = 12;
+                this.x = canvas.width;
+                this.y = Math.random() * (canvas.height - 60) + 30;
+                this.speed = gameSpeed;
+                this.color = '#ff4444';
+            }
+
+            draw() {
+                // Laser beam
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                // Glow effect
+                ctx.shadowColor = '#ff4444';
+                ctx.shadowBlur = 15;
+                ctx.strokeStyle = 'rgba(255, 68, 68, 0.8)';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(this.x - 2, this.y - 2, this.width + 4, this.height + 4);
+                ctx.shadowBlur = 0;
+
+                // Energy effect
+                ctx.fillStyle = 'rgba(255, 100, 100, 0.9)';
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(this.x + i * 18, this.y + 2, 12, 8);
+                }
+            }
+
+            update() {
+                this.x -= this.speed;
+            }
+
+            isOffScreen() {
+                return this.x + this.width < 0;
+            }
+        }
+
+        // Ice Crystal class
+        class IceCrystal {
+            constructor() {
+                this.radius = 10;
+                this.x = canvas.width;
+                this.y = Math.random() * (canvas.height - 40) + 20;
+                this.speed = gameSpeed;
+                this.rotation = 0;
+                this.color = '#00ffff';
+                this.spin = Math.random() * 0.1 + 0.05;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                // Crystal body
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(0, -this.radius);
+                ctx.lineTo(this.radius * 0.7, -this.radius * 0.3);
+                ctx.lineTo(this.radius, 0);
+                ctx.lineTo(this.radius * 0.7, this.radius * 0.3);
+                ctx.lineTo(0, this.radius);
+                ctx.lineTo(-this.radius * 0.7, this.radius * 0.3);
+                ctx.lineTo(-this.radius, 0);
+                ctx.lineTo(-this.radius * 0.7, -this.radius * 0.3);
+                ctx.closePath();
+                ctx.fill();
+
+                // Crystal glow
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 10;
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                ctx.restore();
+            }
+
+            update() {
+                this.x -= this.speed;
+                this.rotation += this.spin;
+            }
+
+            isOffScreen() {
+                return this.x < -20;
+            }
+        }
+
+        // Fire projectile function
+        function fireProjectile() {
+            if (firePower >= 15) {
+                const speed = Math.sqrt(player.velocityX ** 2 + player.velocityY ** 2);
+                const direction = Math.atan2(player.velocityY, player.velocityX);
+
+                // Fire direction (forward)
+                const fireVx = Math.cos(direction);
+                const fireVy = Math.sin(direction);
+
+                const projectile = new FireProjectile(
+                    player.x + player.width / 2 + fireVx * 20,
+                    player.y + player.height / 2 + fireVy * 20,
+                    fireVx,
+                    fireVy
+                );
+
+                fireProjectiles.push(projectile);
+                firePower -= 15;
+                lastShotTime = Date.now();
+            }
+        }
+
+        // Draw Miles Morales with Nanotech Suit
+        function drawFireMan() {
+            ctx.save();
+            ctx.translate(ally.x + ally.width / 2, ally.y + ally.height / 2);
+            ctx.rotate(ally.angle);
+
+            // Thruster glow (back) - purple nanotech
+            ctx.fillStyle = 'rgba(153, 51, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(-ally.width / 2 - 10, 0, 18, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main body - Red nanotech suit
+            ctx.fillStyle = '#990000';
+            ctx.beginPath();
+            ctx.moveTo(-ally.width / 2, -ally.height / 2 + 4);
+            ctx.lineTo(ally.width / 2, -ally.height / 2 + 6);
+            ctx.lineTo(ally.width / 2 - 1, ally.height / 2 - 6);
+            ctx.lineTo(-ally.width / 2 + 1, ally.height / 2 - 4);
+            ctx.closePath();
+            ctx.fill();
+
+            // Nanotech plating outline
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Black chest piece with nanotech web
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(-5, -ally.height / 2 + 1, 10, 9);
+
+            // Small nanotech spider web on chest (purple glow)
+            ctx.strokeStyle = '#9933ff';
+            ctx.lineWidth = 0.9;
+            ctx.shadowColor = '#bb55ff';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(0, -ally.height / 2 + 5, 1, 0, Math.PI * 2);
+            ctx.stroke();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI * 2 / 6) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, -ally.height / 2 + 5);
+                ctx.lineTo(Math.cos(angle) * 4, -ally.height / 2 + 5 + Math.sin(angle) * 4);
+                ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+
+            // Miles Morales - Purple nanotech shoulders
+            ctx.fillStyle = '#660066';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 1, -ally.height / 2 + 6, 10, 12, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 1, -ally.height / 2 + 6, 10, 12, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Purple nanotech glow on shoulders
+            ctx.fillStyle = 'rgba(153, 51, 255, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 1, -ally.height / 2 + 6, 12, 14, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 1, -ally.height / 2 + 6, 12, 14, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gold nanotech accents on shoulders
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 3, -ally.height / 2 + 4, 4, 6, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 3, -ally.height / 2 + 4, 4, 6, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Helmet (face)
+            ctx.fillStyle = '#990000';
+            ctx.beginPath();
+            ctx.arc(0, -ally.height / 2 - 8, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Black nanotech mask on face
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(0, -ally.height / 2 - 8, 10, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Spider-Man eye lenses - purple nanotech glow
+            ctx.fillStyle = '#9933ff';
+            ctx.shadowColor = '#bb55ff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.ellipse(-4, -ally.height / 2 - 9, 3, 3.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(4, -ally.height / 2 - 9, 3, 3.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Eye pupils (black)
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(-4, -ally.height / 2 - 9, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(4, -ally.height / 2 - 9, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye shine (purple)
+            ctx.fillStyle = '#9933ff';
+            ctx.shadowColor = '#bb55ff';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(-2.5, -ally.height / 2 - 10, 0.9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(5.5, -ally.height / 2 - 10, 0.9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Nanotech web pattern on face
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 0.8;
+            for (let i = -7; i <= 7; i += 3) {
+                ctx.beginPath();
+                ctx.moveTo(i, -ally.height / 2 - 14);
+                ctx.lineTo(i, -ally.height / 2 - 2);
+                ctx.stroke();
+            }
+
+            // Arm sections - nanotech material
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 7, -2, 8, 11, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 7, -2, 8, 11, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Arm nanotech accents (purple)
+            ctx.fillStyle = '#9933ff';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 7, -5, 5, 7, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 7, -5, 5, 7, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Web-shooters (nanotech gold)
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillRect(-ally.width / 2 - 10, -4, 4, 3);
+            ctx.fillRect(ally.width / 2 + 6, -4, 4, 3);
+
+            // Lateral thrusters - electric blue nanotech
+            ctx.fillStyle = '#0099ff';
+            ctx.beginPath();
+            ctx.ellipse(-ally.width / 2 - 8, -2, 8, 10, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(ally.width / 2 + 8, -2, 8, 10, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Thruster glow (electric nanotech)
+            ctx.fillStyle = 'rgba(0, 153, 255, 0.5)';
+            ctx.shadowColor = '#0099ff';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(-ally.width / 2 - 8, -2, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(ally.width / 2 + 8, -2, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Front thruster - venom strike nanotech
+            ctx.fillStyle = '#9933ff';
+            ctx.beginPath();
+            ctx.moveTo(ally.width / 2, -3);
+            ctx.lineTo(ally.width / 2 + 8, -1);
+            ctx.lineTo(ally.width / 2 + 8, 1);
+            ctx.lineTo(ally.width / 2, 3);
+            ctx.closePath();
+            ctx.fill();
+
+            // Venom strike glow (purple nanotech)
+            ctx.fillStyle = 'rgba(153, 51, 255, 0.8)';
+            ctx.shadowColor = '#bb55ff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.moveTo(ally.width / 2 + 2, -4);
+            ctx.lineTo(ally.width / 2 + 10, -2);
+            ctx.lineTo(ally.width / 2 + 10, 2);
+            ctx.lineTo(ally.width / 2 + 2, 4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Design spikes (nanotech energy)
+            ctx.strokeStyle = '#9933ff';
+            ctx.lineWidth = 1.6;
+            ctx.shadowColor = '#bb55ff';
+            ctx.shadowBlur = 8;
+
+            ctx.beginPath();
+            ctx.moveTo(-ally.width / 2 - 3, -ally.height / 2 - 1);
+            ctx.lineTo(-ally.width / 2 - 11, -ally.height / 2 - 8);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(ally.width / 2 + 3, -ally.height / 2 - 1);
+            ctx.lineTo(ally.width / 2 + 11, -ally.height / 2 - 8);
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+
+            // LEFT LEG - Nanotech red
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(-7, ally.height / 2 - 6, 6, 10, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Left leg purple nanotech stripe
+            ctx.fillStyle = '#9933ff';
+            ctx.fillRect(-10, ally.height / 2 - 14, 3, 12);
+
+            // Left boot - nanotech material
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(-7, ally.height / 2 + 4, 7, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Left boot purple glow
+            ctx.fillStyle = 'rgba(153, 51, 255, 0.4)';
+            ctx.strokeStyle = '#9933ff';
+            ctx.lineWidth = 1.3;
+            ctx.beginPath();
+            ctx.ellipse(-7, ally.height / 2 + 4, 8, 6, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // RIGHT LEG - Nanotech red
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(7, ally.height / 2 - 6, 6, 10, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Right leg purple nanotech stripe
+            ctx.fillStyle = '#9933ff';
+            ctx.fillRect(7, ally.height / 2 - 14, 3, 12);
+
+            // Right boot - nanotech material
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(7, ally.height / 2 + 4, 7, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Right boot purple glow
+            ctx.fillStyle = 'rgba(153, 51, 255, 0.4)';
+            ctx.strokeStyle = '#9933ff';
+            ctx.lineWidth = 1.3;
+            ctx.beginPath();
+            ctx.ellipse(7, ally.height / 2 + 4, 8, 6, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Draw Spider-Man with Nanotech Suit
+        function drawCoolman() {
+            ctx.save();
+            ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+            ctx.rotate(player.angle);
+
+            // Main thruster glow (nanotech red/cyan)
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+            ctx.beginPath();
+            ctx.arc(-player.width / 2 - 12, 0, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main body - Nanotech red suit
+            ctx.fillStyle = '#990000';
+            ctx.beginPath();
+            ctx.moveTo(-player.width / 2, -player.height / 2 + 5);
+            ctx.lineTo(player.width / 2, -player.height / 2 + 8);
+            ctx.lineTo(player.width / 2 - 2, player.height / 2 - 8);
+            ctx.lineTo(-player.width / 2 + 2, player.height / 2 - 5);
+            ctx.closePath();
+            ctx.fill();
+
+            // Nanotech plating outline
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Center nanotech energy channel (cyan)
+            ctx.fillStyle = '#00ddff';
+            ctx.fillRect(-6, -player.height / 2 + 2, 12, player.height - 8);
+
+            // Nanotech grid pattern on suit
+            ctx.strokeStyle = 'rgba(0, 200, 255, 0.5)';
+            ctx.lineWidth = 0.8;
+            for (let i = -5; i <= 5; i += 3) {
+                ctx.beginPath();
+                ctx.moveTo(i, -player.height / 2 + 2);
+                ctx.lineTo(i, player.height / 2 - 8);
+                ctx.stroke();
+            }
+
+            // Black chest piece with nanotech web
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(-7, -3, 14, 12);
+
+            // Nanotech spider web emblem (glowing cyan)
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 1.3;
+            ctx.shadowColor = '#00ddff';
+            ctx.shadowBlur = 8;
+
+            // Center of web
+            ctx.beginPath();
+            ctx.arc(0, 3, 1.5, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Web lines radiating out
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 / 8) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, 3);
+                ctx.lineTo(Math.cos(angle) * 6, 3 + Math.sin(angle) * 6);
+                ctx.stroke();
+            }
+
+            // Curved web lines
+            for (let r = 3; r <= 6; r += 1.5) {
+                ctx.beginPath();
+                for (let angle = 0; angle < Math.PI * 2; angle += 0.2) {
+                    const x = Math.cos(angle) * r;
+                    const y = 3 + Math.sin(angle) * r;
+                    if (angle === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+
+            // Nanotech shoulders with red accent
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(-player.width / 2 - 2, -player.height / 2 + 8, 12, 14, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player.width / 2 + 2, -player.height / 2 + 8, 12, 14, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Shoulder nanotech glow (cyan)
+            ctx.fillStyle = 'rgba(0, 220, 255, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(-player.width / 2 - 2, -player.height / 2 + 8, 14, 16, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player.width / 2 + 2, -player.height / 2 + 8, 14, 16, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Helmet (face)
+            ctx.fillStyle = '#990000';
+            ctx.beginPath();
+            ctx.arc(0, -player.height / 2 - 10, 13, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Black nanotech mask on face
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(0, -player.height / 2 - 10, 13, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Spider-Man eye lenses - cyan nanotech glow
+            ctx.fillStyle = '#00ffff';
+            ctx.shadowColor = '#00ddff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.ellipse(-5, -player.height / 2 - 12, 4, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(5, -player.height / 2 - 12, 4, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Eye pupils (dark)
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(-5, -player.height / 2 - 12, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(5, -player.height / 2 - 12, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye shine/glow (bright cyan)
+            ctx.fillStyle = '#00ffff';
+            ctx.shadowColor = '#00ffff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(-3.5, -player.height / 2 - 13, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(6.5, -player.height / 2 - 13, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Nanotech web pattern on face (tech lines)
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 1;
+            // Vertical lines
+            for (let i = -9; i <= 9; i += 3) {
+                ctx.beginPath();
+                ctx.moveTo(i, -player.height / 2 - 18);
+                ctx.lineTo(i, -player.height / 2 - 2);
+                ctx.stroke();
+            }
+            // Curved tech lines
+            for (let r = 3; r <= 10; r += 2.5) {
+                ctx.beginPath();
+                for (let angle = 0; angle < Math.PI; angle += 0.3) {
+                    const x = Math.cos(angle) * r - 0.5;
+                    const y = -player.height / 2 - 10 + Math.sin(angle) * (r / 2);
+                    if (angle === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            // Arm guards - nanotech material
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(-player.width / 2 - 8, -5, 10, 14, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player.width / 2 + 8, -5, 10, 14, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Arm nanotech accents (bright cyan)
+            ctx.fillStyle = '#00ddff';
+            ctx.beginPath();
+            ctx.ellipse(-player.width / 2 - 8, -8, 6, 8, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player.width / 2 + 8, -8, 6, 8, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Web-shooter areas on wrists (nanotech blue)
+            ctx.fillStyle = '#0099ff';
+            ctx.fillRect(-player.width / 2 - 12, -6, 5, 4);
+            ctx.fillRect(player.width / 2 + 7, -6, 5, 4);
+
+            // Lateral thrusters - nanotech jets (cyan)
+            ctx.fillStyle = '#00aaff';
+            ctx.beginPath();
+            ctx.moveTo(-player.width / 2 - 10, -3);
+            ctx.lineTo(-player.width / 2 - 18, -5);
+            ctx.lineTo(-player.width / 2 - 18, 5);
+            ctx.lineTo(-player.width / 2 - 10, 3);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 + 10, -3);
+            ctx.lineTo(player.width / 2 + 18, -5);
+            ctx.lineTo(player.width / 2 + 18, 5);
+            ctx.lineTo(player.width / 2 + 10, 3);
+            ctx.closePath();
+            ctx.fill();
+
+            // Thruster glow
+            ctx.fillStyle = 'rgba(0, 200, 255, 0.5)';
+            ctx.shadowColor = '#00ddff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(-player.width / 2 - 18, 0, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(player.width / 2 + 18, 0, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Front thruster - nanotech power core
+            ctx.fillStyle = '#00ddff';
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2, -4);
+            ctx.lineTo(player.width / 2 + 10, -2);
+            ctx.lineTo(player.width / 2 + 10, 2);
+            ctx.lineTo(player.width / 2, 4);
+            ctx.closePath();
+            ctx.fill();
+
+            // Front thruster glow (bright nanotech)
+            ctx.fillStyle = 'rgba(0, 220, 255, 0.8)';
+            ctx.shadowColor = '#00ffff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 + 2, -5);
+            ctx.lineTo(player.width / 2 + 12, -3);
+            ctx.lineTo(player.width / 2 + 12, 3);
+            ctx.lineTo(player.width / 2 + 2, 5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Nanotech design spikes
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = '#00aaff';
+            ctx.shadowBlur = 8;
+
+            ctx.beginPath();
+            ctx.moveTo(-player.width / 2 - 5, -player.height / 2 - 2);
+            ctx.lineTo(-player.width / 2 - 16, -player.height / 2 - 12);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 + 5, -player.height / 2 - 2);
+            ctx.lineTo(player.width / 2 + 16, -player.height / 2 - 12);
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+
+            // LEFT LEG - Nanotech red
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(-8, player.height / 2 - 8, 7, 12, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Left leg nanotech stripe (cyan)
+            ctx.fillStyle = '#00ddff';
+            ctx.fillRect(-12, player.height / 2 - 18, 4, 15);
+
+            // Left boot - nanotech material
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(-8, player.height / 2 + 5, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Left boot glow
+            ctx.fillStyle = 'rgba(0, 220, 255, 0.4)';
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.ellipse(-8, player.height / 2 + 5, 9, 7, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // RIGHT LEG - Nanotech red
+            ctx.fillStyle = '#660000';
+            ctx.beginPath();
+            ctx.ellipse(8, player.height / 2 - 8, 7, 12, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Right leg nanotech stripe (cyan)
+            ctx.fillStyle = '#00ddff';
+            ctx.fillRect(8, player.height / 2 - 18, 4, 15);
+
+            // Right boot - nanotech material
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.ellipse(8, player.height / 2 + 5, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Right boot glow
+            ctx.fillStyle = 'rgba(0, 220, 255, 0.4)';
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.ellipse(8, player.height / 2 + 5, 9, 7, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Draw thrust particles
+        function drawThrustParticles() {
+            player.thrustParticles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.life <= 0) {
+                    player.thrustParticles.splice(index, 1);
+                }
+            });
+
+            player.nanoParticles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.life <= 0) {
+                    player.nanoParticles.splice(index, 1);
+                }
+            });
+
+            // Draw ally thrust particles
+            ally.thrustParticles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.life <= 0) {
+                    ally.thrustParticles.splice(index, 1);
+                }
+            });
+
+            ally.nanoParticles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.life <= 0) {
+                    ally.nanoParticles.splice(index, 1);
+                }
+            });
+        }
+
+        // Create thrust particles
+        function createThrustParticles() {
+            const speed = Math.sqrt(player.velocityX ** 2 + player.velocityY ** 2);
+            if (speed > 1) {
+                for (let i = 0; i < 2; i++) {
+                    const particle = new ThrustParticle(
+                        player.x - Math.cos(player.angle) * 12,
+                        player.y - Math.sin(player.angle) * 12,
+                        player.angle
+                    );
+                    player.thrustParticles.push(particle);
+
+                    // Add nanotech particles
+                    const nanoParticle = new NanoParticle(
+                        player.x + (Math.random() - 0.5) * 20,
+                        player.y + (Math.random() - 0.5) * 20
+                    );
+                    player.nanoParticles.push(nanoParticle);
+                }
+            }
+        }
+
+        // Create thrust particles for ally
+        function createAllyThrustParticles() {
+            const speed = Math.sqrt(ally.velocityX ** 2 + ally.velocityY ** 2);
+            if (speed > 1) {
+                for (let i = 0; i < 2; i++) {
+                    const particle = new AllyThrustParticle(
+                        ally.x - Math.cos(ally.angle) * 10,
+                        ally.y - Math.sin(ally.angle) * 10,
+                        ally.angle
+                    );
+                    ally.thrustParticles.push(particle);
+
+                    // Add nanotech particles (purple for Miles)
+                    const nanoParticle = new AllyNanoParticle(
+                        ally.x + (Math.random() - 0.5) * 15,
+                        ally.y + (Math.random() - 0.5) * 15
+                    );
+                    ally.nanoParticles.push(nanoParticle);
+                }
+            }
+        }
+
+        // Draw background
+        function drawBackground() {
+            // Sky gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#001a4d');
+            skyGradient.addColorStop(0.5, '#003d99');
+            skyGradient.addColorStop(1, '#e0ecff');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Floating ice particles
+            ctx.fillStyle = 'rgba(0, 204, 255, 0.15)';
+            for (let i = 0; i < 30; i++) {
+                const x = (Date.now() / 30 + i * 40) % (canvas.width + 50);
+                const y = (i * 13.3) % canvas.height;
+                ctx.beginPath();
+                ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Moving clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            for (let i = 0; i < 4; i++) {
+                let cloudX = (Date.now() / 80 + i * 250) % (canvas.width + 100);
+                ctx.beginPath();
+                ctx.arc(cloudX, 50 + i * 35, 28, 0, Math.PI * 2);
+                ctx.arc(cloudX + 32, 50 + i * 35, 38, 0, Math.PI * 2);
+                ctx.arc(cloudX + 58, 50 + i * 35, 28, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Collision detection
+        function checkCollision(x1, y1, r1, x2, y2, w2, h2) {
+            const closestX = Math.max(x2, Math.min(x1, x2 + w2));
+            const closestY = Math.max(y2, Math.min(y1, y2 + h2));
+            const distX = x1 - closestX;
+            const distY = y1 - closestY;
+            return (distX * distX + distY * distY) < (r1 * r1);
+        }
+
+        // Update game
+        function update() {
+            if (!gameActive) return;
+
+            // Recharge fire power
+            if (firePower < maxFirePower) {
+                firePower = Math.min(firePower + fireRechargeRate, maxFirePower);
+                document.getElementById('firepower').textContent = Math.floor(firePower);
+            }
+
+            // Update Fire Man ally AI
+            updateAllyAI();
+
+            // Iron Man style flight controls
+            let moving = false;
+
+            if (keys['w'] || keys['arrowup']) {
+                player.velocityY = Math.max(player.velocityY - player.acceleration, -player.maxSpeed);
+                player.angle = 0;
+                moving = true;
+            }
+            if (keys['s'] || keys['arrowdown']) {
+                player.velocityY = Math.min(player.velocityY + player.acceleration, player.maxSpeed);
+                player.angle = Math.PI;
+                moving = true;
+            }
+            if (keys['a'] || keys['arrowleft']) {
+                player.velocityX = Math.max(player.velocityX - player.acceleration, -player.maxSpeed);
+                player.angle = -Math.PI / 2;
+                moving = true;
+            }
+            if (keys['d'] || keys['arrowright']) {
+                player.velocityX = Math.min(player.velocityX + player.acceleration, player.maxSpeed);
+                player.angle = Math.PI / 2;
+                moving = true;
+            }
+
+            // Apply friction when not moving
+            if (!moving) {
+                player.velocityX *= player.friction;
+                player.velocityY *= player.friction;
+                player.angle = 0;
+            }
+
+            // Update position
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+
+            // Boundary collision
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.height > canvas.height) player.y = canvas.height - player.height;
+
+            // Create thrust particles when moving
+            if (moving) {
+                createThrustParticles();
+            }
+
+            // Check for level up
+            if (score >= levelUpThreshold) {
+                levelUp();
+                levelUpThreshold += 250; // Increase threshold for next level
+            }
+
+            // Spawn obstacles (increases with level, capped at level 10)
+            const obstacleSpawnRate = Math.min(0.015 + (level * 0.004), 0.055);
+            if (Math.random() < obstacleSpawnRate) {
+                obstacles.push(new IceLaser());
+            }
+
+            // Spawn coins
+            if (Math.random() < 0.012) {
+                coins.push(new IceCrystal());
+            }
+
+            // Update obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].update();
+
+                if (checkCollision(
+                    player.x + player.width / 2,
+                    player.y + player.height / 2,
+                    20,
+                    obstacles[i].x,
+                    obstacles[i].y,
+                    obstacles[i].width,
+                    obstacles[i].height
+                )) {
+                    lives--;
+                    document.getElementById('lives').textContent = lives;
+
+                    if (lives <= 0) {
+                        endGame();
+                    } else {
+                        obstacles.splice(i, 1);
+                    }
+                } else if (obstacles[i].isOffScreen()) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Update coins
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].update();
+
+                if (checkCollision(
+                    player.x + player.width / 2,
+                    player.y + player.height / 2,
+                    18,
+                    coins[i].x - coins[i].radius,
+                    coins[i].y - coins[i].radius,
+                    coins[i].radius * 2,
+                    coins[i].radius * 2
+                )) {
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    coins.splice(i, 1);
+                } else if (coins[i].isOffScreen()) {
+                    coins.splice(i, 1);
+                }
+            }
+
+            // Update fire projectiles
+            for (let i = fireProjectiles.length - 1; i >= 0; i--) {
+                fireProjectiles[i].update();
+
+                // Check collision with obstacles
+                for (let j = obstacles.length - 1; j >= 0; j--) {
+                    if (checkCollision(
+                        fireProjectiles[i].x,
+                        fireProjectiles[i].y,
+                        fireProjectiles[i].radius,
+                        obstacles[j].x,
+                        obstacles[j].y,
+                        obstacles[j].width,
+                        obstacles[j].height
+                    )) {
+                        score += 5;
+                        document.getElementById('score').textContent = score;
+                        obstacles.splice(j, 1);
+                        fireProjectiles.splice(i, 1);
+                        break;
+                    }
+                }
+
+                if (fireProjectiles[i] && fireProjectiles[i].isOffScreen()) {
+                    fireProjectiles.splice(i, 1);
+                }
+            }
+
+            // Update friend fire projectiles
+            for (let i = friendProjectiles.length - 1; i >= 0; i--) {
+                friendProjectiles[i].update();
+
+                // Check collision with obstacles
+                for (let j = obstacles.length - 1; j >= 0; j--) {
+                    if (checkCollision(
+                        friendProjectiles[i].x,
+                        friendProjectiles[i].y,
+                        friendProjectiles[i].radius,
+                        obstacles[j].x,
+                        obstacles[j].y,
+                        obstacles[j].width,
+                        obstacles[j].height
+                    )) {
+                        score += 3;
+                        document.getElementById('score').textContent = score;
+                        obstacles.splice(j, 1);
+                        friendProjectiles.splice(i, 1);
+                        break;
+                    }
+                }
+
+                if (friendProjectiles[i] && friendProjectiles[i].isOffScreen()) {
+                    friendProjectiles.splice(i, 1);
+                }
+            }
+        }
+
+        // Ally AI update function
+        function updateAllyAI() {
+            // Follow player at a distance
+            const dx = player.x - ally.x;
+            const dy = player.y - ally.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > ally.targetDistance) {
+                // Move towards player
+                const angle = Math.atan2(dy, dx);
+                ally.velocityX = Math.cos(angle) * ally.speed;
+                ally.velocityY = Math.sin(angle) * ally.speed;
+                ally.angle = angle - Math.PI / 2;
+            } else {
+                // Slow down when close
+                ally.velocityX *= 0.9;
+                ally.velocityY *= 0.9;
+            }
+
+            // Create thrust particles while moving
+            createAllyThrustParticles();
+
+            // Update position
+            ally.x += ally.velocityX;
+            ally.y += ally.velocityY;
+
+            // Keep in bounds
+            if (ally.x < 0) ally.x = 0;
+            if (ally.x + ally.width > canvas.width) ally.x = canvas.width - ally.width;
+            if (ally.y < 0) ally.y = 0;
+            if (ally.y + ally.height > canvas.height) ally.y = canvas.height - ally.height;
+
+            // Shoot at obstacles (faster with higher levels, capped for level 10)
+            const shootCooldown = level === maxLevel ? 10 : Math.max(30 - level * 3, 15);
+            ally.shootTimer--;
+            if (ally.shootTimer <= 0 && obstacles.length > 0) {
+                // Find closest obstacle
+                let closestObstacle = obstacles[0];
+                let closestDist = Math.hypot(closestObstacle.x - ally.x, closestObstacle.y - ally.y);
+
+                for (let obs of obstacles) {
+                    const dist = Math.hypot(obs.x - ally.x, obs.y - ally.y);
+                    if (dist < closestDist && dist < 400) {
+                        closestDist = dist;
+                        closestObstacle = obs;
+                    }
+                }
+
+                if (closestDist < 400) {
+                    const shootDx = closestObstacle.x - ally.x;
+                    const shootDy = closestObstacle.y - ally.y;
+                    const shootDist = Math.sqrt(shootDx * shootDx + shootDy * shootDy);
+
+                    const projectile = new FriendFireProjectile(
+                        ally.x + ally.width / 2,
+                        ally.y + ally.height / 2,
+                        shootDx / shootDist,
+                        shootDy / shootDist
+                    );
+
+                    friendProjectiles.push(projectile);
+                    ally.shootTimer = shootCooldown;
+                }
+            }
+        }
+
+        // Level up function
+        function levelUp() {
+            if (level >= maxLevel) {
+                return; // Don't level up beyond max level
+            }
+
+            level++;
+            gameSpeed += 0.5; // Increase game speed
+
+            // Check if we've reached final boss mode
+            if (level === maxLevel) {
+                finalBossMode = true;
+            }
+
+            // Update speed for obstacles and coins
+            for (let obs of obstacles) {
+                obs.speed = gameSpeed;
+            }
+            for (let coin of coins) {
+                coin.speed = gameSpeed;
+            }
+
+            // Show level up animation
+            levelUpTimer = 120; // 2 seconds at 60fps
+            const levelUpElement = document.getElementById('levelUp');
+            document.getElementById('levelOverlay').style.display = 'block';
+            levelUpElement.style.display = 'block';
+
+            // Apply final boss styling for level 10
+            if (level === maxLevel) {
+                levelUpElement.classList.add('final-boss');
+                document.getElementById('levelUpText').textContent = `${levelDescriptions[level]}`;
+                document.getElementById('levelUpText').nextElementSibling.textContent = '⚡ ULTIMATE CHAOS AWAITS! ⚡';
+            } else {
+                levelUpElement.classList.remove('final-boss');
+                document.getElementById('levelUpText').textContent = `${levelDescriptions[level]}`;
+                document.getElementById('levelUpText').nextElementSibling.textContent = 'Get ready for harder challenges!';
+            }
+
+            document.getElementById('level').textContent = level;
+
+            // Hide after animation
+            setTimeout(() => {
+                document.getElementById('levelOverlay').style.display = 'none';
+                levelUpElement.style.display = 'none';
+            }, 2000);
+        }
+
+        // Draw game
+        function draw() {
+            drawBackground();
+
+            coins.forEach(coin => coin.draw());
+            obstacles.forEach(obs => obs.draw());
+            fireProjectiles.forEach(projectile => projectile.draw());
+            friendProjectiles.forEach(projectile => projectile.draw());
+
+            drawThrustParticles();
+            drawCoolman();
+            drawFireMan();
+
+            // Draw UI text
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Distance: ' + Math.floor(score / 10) + 'm', 10, 30);
+            ctx.fillText('Speed: ' + Math.floor(Math.sqrt(player.velocityX ** 2 + player.velocityY ** 2) * 10) / 10, 10, canvas.height - 10);
+
+            // Level up progress bar
+            const progressPercentage = (score % 250) / 250;
+            const barWidth = 150;
+            const barX = canvas.width - barWidth - 20;
+            const barY = canvas.height - 30;
+
+            // Background bar
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(barX, barY, barWidth, 12);
+
+            // Progress bar
+            ctx.fillStyle = 'rgba(0, 200, 255, 0.8)';
+            ctx.fillRect(barX, barY, barWidth * progressPercentage, 12);
+
+            // Border
+            ctx.strokeStyle = 'rgba(0, 200, 255, 1)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(barX, barY, barWidth, 12);
+
+            // Label
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = 'bold 11px Arial';
+            ctx.fillText('NEXT LEVEL', barX + 35, barY - 5);
+        }
+
+        // Game loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // End game
+        function endGame() {
+            gameActive = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalLevel').textContent = level;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        // Start game
+        gameLoop();
+    </script>
+</body>
+</html>
