@@ -269,9 +269,330 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 99;
         }
+
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 101;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            width: 95%;
+        }
+
+        .instructions-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+        }
+
+        .instructions-modal h1 {
+            color: #0066cc;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .instructions-modal h2 {
+            color: #0066cc;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #00ccff;
+            padding-bottom: 8px;
+            font-size: 1.4em;
+        }
+
+        .instructions-modal h3 {
+            color: #003d99;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .instructions-modal p {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .instructions-modal ul, .instructions-modal ol {
+            margin-left: 25px;
+            margin-bottom: 12px;
+        }
+
+        .instructions-modal li {
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .close-modal:hover {
+            background: #00ccff;
+            color: #0066cc;
+        }
+
+        .readme-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 102;
+            font-size: 14px;
+        }
+
+        .readme-button:hover {
+            background: #00ccff;
+            color: #0066cc;
+        }
     </style>
 </head>
 <body>
+    <button class="readme-button" onclick="openInstructions()">📖 Read Me</button>
+
+    <div class="instructions-overlay" id="instructionsOverlay"></div>
+    <div class="instructions-modal" id="instructionsModal">
+        <button class="close-modal" onclick="closeInstructions()">×</button>
+        <h1>🕷️ Spider-Man & Miles Morales: Flight Combat Adventure</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 25px;">Game Guide & Instructions</p>
+
+        <h2>📖 The Story</h2>
+        <p>You are <strong>two superheroes fighting together in the sky!</strong></p>
+
+        <div style="background: #fff5e6; padding: 15px; border-left: 4px solid #ff6b35; border-radius: 5px; margin: 15px 0;">
+            <strong>🔴 COOLMAN = Spider-Man</strong>
+            <ul style="margin-top: 8px;">
+                <li>Superhero with red and blue suit</li>
+                <li>Flies really fast using nanotech thrusters (rocket boosters!)</li>
+                <li>Has a glowing blue shield that protects him</li>
+                <li>Shoots web projectiles to fight bad guys</li>
+                <li>Brave and strong! 💪</li>
+            </ul>
+        </div>
+
+        <div style="background: #f0e6ff; padding: 15px; border-left: 4px solid #8b35ff; border-radius: 5px; margin: 15px 0;">
+            <strong>🟣 FIREMAN = Miles Morales</strong>
+            <ul style="margin-top: 8px;">
+                <li>Another superhero with a purple suit</li>
+                <li>Spider-Man's best friend and partner</li>
+                <li>Shoots fire and electricity at enemies ⚡🔥</li>
+                <li>Fights by your side automatically</li>
+                <li>Helps you defeat all the bad guys!</li>
+            </ul>
+        </div>
+
+        <h2>🎯 What Are You Doing Here?</h2>
+        <p>You're in a <strong>sky battle with a set ending!</strong></p>
+        <p>It's NOT endless - there's a <strong>specific goal you're trying to reach:</strong></p>
+        <p>Enemies attack you in waves across <strong>10 levels</strong>, and you need to:</p>
+        <ol>
+            <li><strong>SURVIVE</strong> - Don't let enemies hurt you too much</li>
+            <li><strong>FIGHT BACK</strong> - Shoot and destroy all the enemies</li>
+            <li><strong>COLLECT ENERGY</strong> - Pick up blue crystals for power</li>
+            <li><strong>GET STRONGER</strong> - Level up by getting enough points</li>
+            <li><strong>REACH LEVEL 10</strong> - The final level where you meet the ultimate villain</li>
+            <li><strong>DEFEAT VENOM</strong> - Fight the big boss at Level 10</li>
+            <li><strong>WIN THE GAME</strong> - Beat Venom and the game is over! 🎉</li>
+        </ol>
+
+        <h2>⚙️ How Does It All Work?</h2>
+        <h3>The Nanotech System 🤖</h3>
+        <p>Both Spider-Man and Miles have <strong>nanotech armor</strong> - special high-tech suits that:</p>
+        <ul>
+            <li>Let them <strong>fly in the sky</strong> using thrusters</li>
+            <li>Create <strong>projectiles</strong> (web shots and electricity bolts) to attack</li>
+            <li>Generate a <strong>protective shield</strong> around Spider-Man</li>
+            <li>Leave <strong>glowing particle effects</strong> as they move</li>
+        </ul>
+
+        <h3>The 10 Levels 📈</h3>
+        <p>The game gets <strong>harder and harder:</strong></p>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <tr style="background: #0066cc; color: white;">
+                <th style="padding: 10px; text-align: left; border: 1px solid #00ccff;">Level</th>
+                <th style="padding: 10px; text-align: left; border: 1px solid #00ccff;">Difficulty</th>
+                <th style="padding: 10px; text-align: left; border: 1px solid #00ccff;">What Happens</th>
+            </tr>
+            <tr style="background: #f5f5f5;">
+                <td style="padding: 10px; border: 1px solid #00ccff;">1-3</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">Easy 😊</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">Few enemies, lots of time</td>
+            </tr>
+            <tr style="background: #ffffff;">
+                <td style="padding: 10px; border: 1px solid #00ccff;">4-6</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">Medium 😐</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">More enemies, faster attacks</td>
+            </tr>
+            <tr style="background: #f5f5f5;">
+                <td style="padding: 10px; border: 1px solid #00ccff;">7-9</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">Hard 😰</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">Many enemies, rapid fire</td>
+            </tr>
+            <tr style="background: #ffffff;">
+                <td style="padding: 10px; border: 1px solid #00ccff;">10</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">BOSS! 😱</td>
+                <td style="padding: 10px; border: 1px solid #00ccff;">VENOM appears!</td>
+            </tr>
+        </table>
+
+        <p>Each level needs more points to complete. As you level up:</p>
+        <ul>
+            <li>⚡ Enemies shoot faster</li>
+            <li>🔴 More obstacles appear</li>
+            <li>💥 Everything moves quicker</li>
+            <li>🎯 You need better strategy!</li>
+        </ul>
+
+        <h2>👹 Who Is VENOM?</h2>
+        <p><strong>VENOM</strong> is the <strong>final boss</strong> - the big bad guy you fight at Level 10!</p>
+
+        <h3>What he does:</h3>
+        <ul>
+            <li>Stays in the center of the screen</li>
+            <li>Shoots projectiles at you constantly</li>
+            <li>Gets stronger as his health goes down</li>
+            <li>Has 3 different attack phases</li>
+        </ul>
+
+        <h3>How to defeat him:</h3>
+        <ul>
+            <li>Shoot him with SPACEBAR repeatedly</li>
+            <li>Miles helps you by shooting electricity and fire</li>
+            <li>Use your shield to block his attacks</li>
+            <li>Keep moving so you don't get hit</li>
+            <li>Don't give up! Keep shooting until he's defeated!</li>
+        </ul>
+
+        <p>When you beat Venom, you see: <strong>⭐⭐⭐⭐⭐ VICTORY!</strong></p>
+
+        <h2>🔧 The Mechanics - How It All Works</h2>
+
+        <h3>Your Shield 🛡️</h3>
+        <ul>
+            <li>Protects you from damage</li>
+            <li>Regenerates slowly when you're not being attacked</li>
+            <li>Breaks after taking too much damage</li>
+            <li>When it breaks, you lose a LIFE</li>
+            <li>You start with 3 lives</li>
+        </ul>
+
+        <h3>Three Types of Attacks 💥</h3>
+        <p><strong>1. Spider-Man's Web Shots 🕸️</strong></p>
+        <ul>
+            <li>Press SPACEBAR</li>
+            <li>White/yellow projectiles</li>
+            <li>Fast and reliable</li>
+        </ul>
+
+        <p><strong>2. Miles' Fire Attacks 🔥</strong></p>
+        <ul>
+            <li>Miles shoots automatically (25% of the time)</li>
+            <li>Orange/red fireballs</li>
+            <li>Damages enemies</li>
+        </ul>
+
+        <p><strong>3. Miles' Electricity Attacks ⚡</strong></p>
+        <ul>
+            <li>Miles shoots electricity (75% of the time)</li>
+            <li>Bright cyan bolts with electric effects</li>
+            <li>Looks super cool!</li>
+        </ul>
+
+        <h3>Blue Energy Crystals 🟦</h3>
+        <ul>
+            <li>Float around the screen</li>
+            <li>Collect them by flying over them</li>
+            <li>Give you POINTS!</li>
+            <li>Help you level up faster</li>
+        </ul>
+
+        <h3>Red Enemy Obstacles 🔴</h3>
+        <ul>
+            <li>Shoot at you constantly</li>
+            <li>You must destroy them</li>
+            <li>They explode when defeated</li>
+            <li>Give you points too!</li>
+        </ul>
+
+        <h2>🎮 The Full Game Flow</h2>
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; line-height: 2; font-size: 0.95em;">
+            START GAME (Level 1)<br>
+            ↓<br>
+            Fly around, collect crystals, destroy enemies<br>
+            ↓<br>
+            Get enough points → LEVEL UP! ⬆️<br>
+            ↓<br>
+            Repeat for Levels 2, 3, 4, 5, 6, 7, 8, 9<br>
+            ↓<br>
+            REACH LEVEL 10 → VENOM APPEARS! 👹<br>
+            ↓<br>
+            Epic battle! Shoot Venom with all your power!<br>
+            ↓<br>
+            Defeat Venom → ⭐⭐⭐⭐⭐ YOU WIN! 🎉
+        </div>
+
+        <h2>💾 Your Progress Is Saved!</h2>
+        <p>The game remembers:</p>
+        <ul>
+            <li>🏆 Your <strong>High Score</strong> - best points ever</li>
+            <li>📊 Your <strong>Best Level</strong> - furthest you've gotten</li>
+            <li>This data stays even if you close the game!</li>
+        </ul>
+
+        <h2>🤝 You're Not Alone</h2>
+        <p><strong>Miles fights with you!</strong></p>
+        <ul>
+            <li>He automatically shoots enemies</li>
+            <li>He helps you defeat Venom</li>
+            <li>You work as a TEAM to save the day</li>
+        </ul>
+
+        <h2>🎮 About This Game</h2>
+        <p style="font-size: 1.1em; font-weight: bold; color: #003d99;">Created by <strong>NEIL</strong></p>
+        <p style="font-size: 1em; color: #003d99;">Age 9 | P3 Graciousness RVPS | Singapore</p>
+        <p>Neil designed and built this fun game for everyone to enjoy. We hope you have a great time playing it!</p>
+
+        <h2>🎯 The Ultimate Goal</h2>
+        <p><strong>DEFEAT VENOM AND SAVE THE WORLD!</strong> 🌍</p>
+        <p>That's the whole story. You and your partner Miles are the only ones who can stop the evil Venom from destroying everything.</p>
+        <p><strong>Will you answer the call?</strong></p>
+        <p style="font-size: 1.2em; text-align: center; margin-top: 20px;"><strong>Let's go save the world! 🦸‍♂️⚡🔥</strong></p>
+    </div>
+
     <div class="game-container">
         <div class="game-info">
             <div>🕷️ SPIDER-MAN & MILES MORALES - FLIGHT COMBAT 🕷️</div>
@@ -309,6 +630,22 @@
     </div>
 
     <script>
+        // Instructions Modal Functions
+        function openInstructions() {
+            document.getElementById('instructionsOverlay').style.display = 'block';
+            document.getElementById('instructionsModal').style.display = 'block';
+        }
+
+        function closeInstructions() {
+            document.getElementById('instructionsOverlay').style.display = 'none';
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+
+        // Close modal when clicking on overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('instructionsOverlay').addEventListener('click', closeInstructions);
+        });
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
