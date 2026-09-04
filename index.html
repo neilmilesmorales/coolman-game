@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spider-Man & Miles Morales - Flight Combat</title>
+    <title>Spider-Man & Miles Morales - Flight Combat v2</title>
     <style>
         * {
             margin: 0;
@@ -701,6 +701,7 @@
                 this.radius = 4;
                 this.life = 100;
                 this.maxLife = 100;
+                this.type = 'fire';
             }
 
             update() {
@@ -731,6 +732,83 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
                 ctx.fill();
+
+                ctx.shadowBlur = 0;
+            }
+
+            isOffScreen() {
+                return this.x < -20 || this.x > canvas.width + 20 ||
+                       this.y < -20 || this.y > canvas.height + 20;
+            }
+        }
+
+        // Electricity projectile class for Miles
+        class ElectricityProjectile {
+            constructor(x, y, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx * 12;
+                this.vy = vy * 12;
+                this.radius = 5;
+                this.life = 100;
+                this.maxLife = 100;
+                this.type = 'electricity';
+                this.segments = [];
+                this.regenerateSegments();
+            }
+
+            regenerateSegments() {
+                this.segments = [];
+                for (let i = 0; i < 3; i++) {
+                    this.segments.push({
+                        offsetX: (Math.random() - 0.5) * 8,
+                        offsetY: (Math.random() - 0.5) * 8
+                    });
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+                if (this.life % 5 === 0) {
+                    this.regenerateSegments();
+                }
+            }
+
+            draw() {
+                // Electric glow
+                ctx.shadowColor = '#00ddff';
+                ctx.shadowBlur = 15;
+
+                // Outer electric glow (cyan)
+                ctx.strokeStyle = 'rgba(0, 200, 255, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Main electric core (bright cyan)
+                ctx.fillStyle = '#00ffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Inner core (white)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw electric tendrils
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+                ctx.lineWidth = 1.5;
+                for (let seg of this.segments) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x + seg.offsetX, this.y + seg.offsetY);
+                    ctx.stroke();
+                }
 
                 ctx.shadowBlur = 0;
             }
@@ -2247,12 +2325,23 @@
                     const shootDy = target.y - ally.y;
                     const shootDist = Math.sqrt(shootDx * shootDx + shootDy * shootDy);
 
-                    const projectile = new FriendFireProjectile(
-                        ally.x + ally.width / 2,
-                        ally.y + ally.height / 2,
-                        shootDx / shootDist,
-                        shootDy / shootDist
-                    );
+                    // 70% fire, 30% electricity
+                    let projectile;
+                    if (Math.random() < 0.7) {
+                        projectile = new FriendFireProjectile(
+                            ally.x + ally.width / 2,
+                            ally.y + ally.height / 2,
+                            shootDx / shootDist,
+                            shootDy / shootDist
+                        );
+                    } else {
+                        projectile = new ElectricityProjectile(
+                            ally.x + ally.width / 2,
+                            ally.y + ally.height / 2,
+                            shootDx / shootDist,
+                            shootDy / shootDist
+                        );
+                    }
 
                     friendProjectiles.push(projectile);
                     ally.shootTimer = shootCooldown;
